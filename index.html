@@ -984,7 +984,9 @@ const SPR = (() => {
   CHR.nurse  = buildSheet(ladyGrids, palNurse);
   CHR.girl   = buildSheet(ladyGrids, palGirl);
   const palGolan = { o: '#3a3028', h: '#f0d068', s: '#f6c69c', j: '#c04878', J: '#98325c', k: '#403830' };
+  const palBengurion = { o: '#3a3028', h: '#f4f4f4', s: '#e0b488', j: '#d8cba0', J: '#b6a878', w: '#f0ece0', b: '#c8bd94', B: '#a89c74', k: '#403830' };
   CHR.golan    = buildSheet(ladyGrids, palGolan);
+  CHR.bengurion= buildSheet(npcGrids, palBengurion);
   CHR.lapid    = buildSheet(npcGrids, palLapid);
   CHR.gantz    = buildSheet(npcGrids, palGantz);
   CHR.eisenkot = buildSheet(npcGrids, palEisenkot);
@@ -1665,7 +1667,7 @@ const MONART3 = {};
     ELYONMON:   { old:1, base: humanoid, skin:'#e8b088', hairStyle:'side', hairC:'#6a6a75', suit:'#3a3444', robe:1, acc:'gavel', glasses:1 },
     /* core knesset */
     BIBIMON:    { old:1, base: humanoid, skin:'#e8b088', hairStyle:'comb', hairC:'#c8c8d0', suit:'#20283a', tie:'#4a78c8', acc:'phone' },
-    BIBIKING:   { old:1, base: humanoid, skin:'#e8b088', hairStyle:'comb', hairC:'#d8d8e0', suit:'#181c2c', tie:'#d8a020', acc:'phone', crown:1 },
+    BIBIKING:   { old:1, base: humanoid, skin:'#e8b088', hairStyle:'comb', hairC:'#d8d8e0', suit:'#181c2c', tie:'#d8a020', acc:'phone' },
     BENGVIRON:  { base: humanoid, skin:'#dea87e', hairStyle:'kippah', hairC:'#2a2018', kippahC:'#181818', suit:'#38404e', tie:'#c03030', beard:'full', beardC:'#2a2018', acc:'gun' },
     GANTZON:    { old:1, base: humanoid, skin:'#e2ac84', hairStyle:'bald', suit:'#4a5a70', shirt:'#e8ecf0', tie:'#7890b0', glasses:1, acc:'briefcase' },
     SMOTRICHMON:{ base: humanoid, skin:'#dea87e', hairStyle:'kippah', hairC:'#3a2a1a', kippahC:'#c8b088', suit:'#3e4656', tie:'#e0e0e8', beard:'full', beardC:'#3a2a1a', acc:'briefcase' },
@@ -2656,11 +2658,11 @@ const DATA = (() => {
       lose:'עבודה טובה, בחור. או בחורה. מי שאתה.',
       win:'אמריקה חזרה! ...לאן חזרה? לא משנה.',
       party: [['MANDATMON',17],['IRONDOMEMON',18],['BIDENMON',19]] },
-    champ_bibi: { name:'ביבי', cls:'האלוף', sprite:'leader', money:5000,
-      intro:'ביבי: כולם עברו דרך החדר הזה. כולם ישבו על הכיסא הזה. ואף אחד... אף אחד לא נשאר עליו חוץ ממני.',
-      lose:'...מרשים. קח את התואר. הם יגידו שנתתי לך לנצח.',
-      win:'אין כלום, כי לא היה כלום! והכיסא נשאר שלי.',
-      party: [['SPINMON',16],['KOALITZMON',17],['DERIDERI',17],['BIBIKING',18]] },
+    champ_bengurion: { name:'בן-גוריון', cls:'האלוף האגדי', sprite:'bengurion', money:6000,
+      intro:'בן-גוריון: כל המפלגות שפגשת — ימין, שמאל, מרכז — כולן חלק מאותו חלום. הבאת את כולן עד הנה. עכשיו, בַּחוּר, תראה לזקן מה למדת.',
+      lose:'הזקן מחייך: לא צריך להיות מומחה כדי להיות חלוץ — צריך רק להתחיל. המדינה בידיים טובות.',
+      win:'עוד לא. תתאמן, תחזור, ותנצח. ככה בונים מדינה — ניסיון אחרי ניסיון.',
+      party: [['DRUZMON',17],['MANDATMON',18],['CHATUFMON',18],['KOTELMON',20]] },
     tower_guard: { name:'המאבטח סטיב', cls:'שומר המגדל', sprite:'kid2', money:800,
       intro:'סטיב: רק אח״מים נכנסים למגדל. אתה בכלל ברשימה?',
       lose:'אוקיי אוקיי, אתה ברשימה.', win:'אמרתי לך. אין כניסה.',
@@ -3321,7 +3323,7 @@ const MAPS = (() => {
       { id: 'elite2', sprite: 'putin', x: 9, y: 8, dir: 'left', move: 'static', trainer: 'elite_putin', sight: 4 },
       { id: 'elite3', sprite: 'macron', x: 2, y: 6, dir: 'right', move: 'static', trainer: 'elite_macron', sight: 4 },
       { id: 'elite4', sprite: 'biden', x: 9, y: 4, dir: 'left', move: 'static', trainer: 'elite_biden', sight: 4 },
-      { id: 'champ', sprite: 'leader', x: 5, y: 1, dir: 'down', move: 'static', script: 'champion' },
+      { id: 'champ', sprite: 'bengurion', x: 5, y: 1, dir: 'down', move: 'static', script: 'champion' },
     ],
     signs: {}, items: [], events: [], encounters: null,
   };
@@ -4205,6 +4207,12 @@ const ENG = (() => {
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, G.W, G.H);
       ctx.globalAlpha = 1;
     }
+    if (G.trailer) {
+      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, G.W, 15); ctx.fillRect(0, G.H - 15, G.W, 15);
+      if (G.trailer.cap) FONT.center(ctx, G.trailer.cap, G.W / 2, G.H - 12, '#f8f0d8', { shadow: '#000' });
+      ctx.fillStyle = 'rgba(248,208,72,.75)'; ctx.fillRect(0, G.H - 2, G.W * Math.max(0, Math.min(1, G.trailer.prog || 0)), 2);
+      if (((G.frame >> 5) & 1)) FONT.draw(ctx, 'SKIP >', G.W - 40, 5, 'rgba(255,255,255,.5)', { noShadow: true, scale: 1 });
+    }
   }
   function pump(now) {
     if (!last) last = now;
@@ -4523,6 +4531,7 @@ const OW = (() => {
     const t = MAPS.tileAt(map, G.x, G.y);
     // grass rustle
     if (t.grass) rustles.push({ x: G.x, y: G.y, t: 16 });
+    if (G.trailer) return; // the trailer director controls warps/encounters/scripts
     // warp
     const w = MAPS.warpAt(map, G.x, G.y);
     if (w) { await doWarp(w); return; }
@@ -4645,7 +4654,7 @@ const OW = (() => {
   async function startBattle(cfg, musicStarted) {
     const wasLocked = lock;
     lock = true;
-    if (!musicStarted) AUD.music((cfg.trainerId || '').startsWith('gym_') || cfg.trainerId === 'champ_bibi' || cfg.kind === 'static' ? 'boss' : 'battle');
+    if (!musicStarted) AUD.music((cfg.trainerId || '').startsWith('gym_') || cfg.trainerId === 'champ_bengurion' || cfg.kind === 'static' ? 'boss' : 'battle');
     await ENG.flashScreen(2, 4);
     await ENG.fadeOut(12);
     const result = await new Promise(res => ENG.push(BATTLE.scene(cfg, res)));
@@ -4895,21 +4904,21 @@ const OW = (() => {
       lock = true;
       const missing = ['tr_elite1', 'tr_elite2', 'tr_elite3', 'tr_elite4'].filter(f => !G.flags[f]);
       if (missing.length) {
-        await UI.say('ביבי: עוד לא עברת את כל הארבעה. בליגה שלי אין קיצורי דרך. חוץ מהשלי.');
+        await UI.say('בן-גוריון: קודם תעבור את הארבעה. גם אני חיכיתי בתור. פעם או פעמיים.');
         lock = false; return;
       }
       if (G.flags.league_done) {
-        await UI.say('ביבי: האלוף החדש. תיהנה מהתואר. אני נהניתי ממנו 17 שנה.');
+        await UI.say('בן-גוריון: האלוף החדש! המדינה בידיים טובות. לך עכשיו — יש עוד מה לבנות.');
         lock = false; return;
       }
-      const t = DATA.TRAINERS.champ_bibi;
+      const t = DATA.TRAINERS.champ_bengurion;
       await UI.say(t.intro);
-      const res = await startBattle({ kind: 'trainer', trainerId: 'champ_bibi' });
+      const res = await startBattle({ kind: 'trainer', trainerId: 'champ_bengurion' });
       if (res.outcome === 'win') {
         G.flags.league_done = true; G.badges.push('אלוף הליגה');
         AUD.jingle('badge');
         await UI.say(G.name + ' ניצח את ליגת בלפור והוכתר לאלוף!');
-        await UI.say('ביבי: ...הכיסא שלך. בינתיים. אני אחזור. אני תמיד חוזר.');
+        await UI.say('בן-גוריון: ' + t.lose);
         await UI.say('(עכשיו, כשהליגה מאחוריך, האגדות מסתובבות חופשי: טראמפמון במגדל, פוטינמון בצפון, זלנסקימון בדרום, וביבימון במליאה...)');
         SCN.checkAchievements && SCN.checkAchievements('badge');
         if (SCN.CoalitionScene) await new Promise(res2 => ENG.push(SCN.CoalitionScene(res2)));
@@ -6442,7 +6451,8 @@ const SCN = (() => {
   function IntroScene() {
     let started = false;
     async function run() {
-      await UI.say('שלום לך! ברוך הבא לעולם הפוקימון-כנסת!');
+      await UI.say('(סאטירה. הלעג פה מתחלק שווה בשווה — ימין, שמאל, מרכז וחרדים. אף פוליטיקאי לא באמת נפגע.)');
+      await UI.say('שלום לך! ברוך הבא לעולם הכנסתמון!');
       await UI.say('שמי בג״ץ. כולם קוראים לי פרופסור בג״ץ. אף אחד לא יודע למה, וזה כבר לא שפיט.');
       await UI.say('העולם שלנו מלא ביצורים מוזרים: פוליטיקאים! אנחנו תופסים אותם, מאמנים אותם, ומקווים שלא יברחו עם הקופה.');
       await UI.say('הסיפור הפוליטי שלך מתחיל ממש עכשיו! אבל קודם...');
@@ -7241,189 +7251,174 @@ const SCN = (() => {
     };
   }
 
-  /* ---------------- cinematic trailer / attract mode ---------------- */
-  function TrailerScene() {
-    let start = -1, shotIdx = -1;
-
-    // ---- shared draw helpers ----
-    function bg(ctx, top, bot) {
-      const g = ctx.createLinearGradient(0, 0, 0, G.H);
-      g.addColorStop(0, top); g.addColorStop(1, bot);
-      ctx.fillStyle = g; ctx.fillRect(0, 0, G.W, G.H);
-    }
-    function mon(ctx, id, cx, cy, size, f, sway) {
-      const bob = Math.sin(f / 9 + cx) * (size * 0.05);
-      ctx.fillStyle = 'rgba(0,0,0,.28)';
-      ctx.beginPath(); ctx.ellipse(cx, cy + size / 2 - 1, size * 0.36, size * 0.11, 0, 0, 7); ctx.fill();
-      if (MONART[id]) {
-        ctx.save();
-        if (sway) { ctx.translate(cx, cy); ctx.rotate(Math.sin(f / 14) * 0.05); ctx.translate(-cx, -cy); }
-        ctx.drawImage(MONART[id], cx - size / 2, cy - size / 2 + bob, size, size);
-        ctx.restore();
-      }
-    }
-    function sparkles(ctx, f, n, col) {
-      for (let i = 0; i < n; i++) {
-        const a = 0.3 + 0.5 * Math.abs(Math.sin(f / 7 + i * 1.9));
-        const x = (i * 61 + (f * (0.4 + (i % 3) * 0.2))) % (G.W + 20) - 10;
-        const y = (i * 43 + 13) % G.H + Math.sin(f / 20 + i) * 4;
-        ctx.fillStyle = col.replace('A', a.toFixed(2));
-        ctx.fillRect(x, y, 2, 2);
-      }
-    }
-    // Hebrew title card: lines rise + fade, gold accent on first line
-    function card(ctx, p, big, small, col) {
-      const rise = (1 - Math.min(1, p * 3)) * 8;
-      col = col || '#f8d048';
-      FONT.center(ctx, big, 120, 58 - rise, '#2a1626', { scale: 2.4, noShadow: true });
-      FONT.center(ctx, big, 118.5, 56.5 - rise, col, { scale: 2.4, shadow: '#1a0e18' });
-      if (small) FONT.center(ctx, small, 120, 90 + rise, '#f0e8d8', { shadow: '#2a1626' });
-    }
-
-    // ---- the shot list (durations in frames @60fps) ----
-    const SHOTS = [
-      { dur: 130, music: 'title', draw(p, ctx, f) { // cold open
-        bg(ctx, '#0a0b18', '#181833');
-        sparkles(ctx, f, 26, 'rgba(200,210,255,A)');
-        FONT.center(ctx, 'בעולם שכולו בחירות...', 120, 66, '#c8d0f0', { shadow: '#0a0b18' });
-        FONT.center(ctx, 'רק אלוף אחד ישרוד.', 120, 86, '#8890c0', { noShadow: true });
-      } },
-      { dur: 130, draw(p, ctx, f) { // logo slam
-        bg(ctx, '#12203e', '#5c2c50');
-        const glow = ctx.createRadialGradient(120, 70, 4, 120, 70, 70 + Math.sin(f / 8) * 6);
-        glow.addColorStop(0, 'rgba(255,224,150,.5)'); glow.addColorStop(1, 'rgba(255,224,150,0)');
-        ctx.fillStyle = glow; ctx.fillRect(0, 0, G.W, G.H);
-        // shockwave ring on the hit
-        if (f < 26) { ctx.strokeStyle = `rgba(248,208,72,${1 - f / 26})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(120, 66, f * 5, 0, 7); ctx.stroke(); }
-        const pop = f < 10 ? 1 + (10 - f) * 0.08 : 1;
-        FONT.center(ctx, 'כנסתמון', 121.5, 50, '#2a1020', { scale: 3.6 * pop, noShadow: true });
-        FONT.center(ctx, 'כנסתמון', 120, 48, '#f8d048', { scale: 3.6 * pop, shadow: '#301828' });
-        FONT.center(ctx, 'גרסת הקואליציה', 120, 92, '#f0e0c0', { shadow: '#301828' });
-      } },
-      { dur: 150, draw(p, ctx, f) { // catch 'em all — street monster carousel
-        bg(ctx, '#2b2e50', '#171833');
-        sparkles(ctx, f, 18, 'rgba(255,220,150,A)');
-        const roster = ['FREHAMON', 'ARSMON', 'HNUNMON', 'METALMON', 'GAMERMON', 'TIKTOKMON', 'SAVTAMON'];
-        for (let i = 0; i < roster.length; i++) {
-          const x = ((f * 1.6) + i * 150) % (G.W + 180) - 90;
-          mon(ctx, roster[i], x, 74, 66, f + i * 8, true);
-        }
-        card(ctx, p, 'תפוס את כולם!', '76 מפלצות ישראליות', '#f8d048');
-      } },
-      { dur: 130, music: 'battle', draw(p, ctx, f) { // action battle
-        bg(ctx, '#7ec8f2', '#bfe6da');
-        ctx.fillStyle = '#8cc45c'; ctx.fillRect(0, 96, G.W, 64);
-        const shake = f < 60 && f > 40 ? Math.sin(f * 3) * 3 : 0;
-        ctx.save(); ctx.translate(shake, 0);
-        mon(ctx, 'BENGVIRON', 176, 58, 60, f);
-        mon(ctx, 'ATIDMON', 64, 104, 68, f);
-        ctx.restore();
-        // fire burst on the foe
-        if (f > 40 && f < 70) for (let i = 0; i < 14; i++) {
-          const a = (f - 40) / 30; ctx.globalAlpha = 1 - a;
-          ctx.fillStyle = ['#f8d030', '#f08030', '#e84020'][i % 3];
-          ctx.fillRect(176 + Math.cos(i) * a * 40, 58 + Math.sin(i * 2) * a * 30, 3, 3);
-          ctx.globalAlpha = 1;
-        }
-        card(ctx, p, 'קרבות מסעירים', 'אפקט לכל סוג', '#f85030');
-      } },
-      { dur: 140, draw(p, ctx, f) { // gym leaders
-        bg(ctx, '#241c34', '#3c2a4a');
-        const leaders = ['MANDATMON', 'GANTZON', 'IRONDOMEMON', 'BENGVIRON'];
-        const labels = ['מאי גולן', 'גנץ', 'איזנקוט', 'בן-גביר'];
-        for (let i = 0; i < 4; i++) {
-          const cx = 33 + i * 58, on = f > 12 + i * 14;
-          if (on) { mon(ctx, leaders[i], cx, 60, 50, f + i * 5); FONT.center(ctx, labels[i], cx, 92, '#f0e0c0', { noShadow: true }); }
-        }
-        FONT.center(ctx, 'נצח את ראשי המכונים', 120, 20, '#f8d048', { shadow: '#241c34' });
-      } },
-      { dur: 150, music: 'boss', draw(p, ctx, f) { // the world leaders league
-        bg(ctx, '#1a0e1e', '#3a1420');
-        for (let i = 0; i < 40; i++) { const a = 0.2 + 0.3 * Math.sin(f / 10 + i); ctx.fillStyle = `rgba(200,60,60,${a})`; ctx.fillRect((i * 31 + 7) % 240, (i * 53 + 11) % 160, 1, 1); }
-        const world = ['TRUMPMON', 'PUTINMON', 'MACRONMON', 'BIDENMON'];
-        for (let i = 0; i < 4; i++) {
-          const x = ((f * 1.2) + i * 130) % (G.W + 160) - 80;
-          mon(ctx, world[i], x, 72, 62, f + i * 9, true);
-        }
-        card(ctx, p, 'ליגת בלפור', 'המנהיגים הגדולים בעולם', '#e85040');
-      } },
-      { dur: 130, draw(p, ctx, f) { // the champion
-        bg(ctx, '#12203e', '#20283a');
-        // lightning flicker
-        if ((f >> 3) % 5 === 0) { ctx.fillStyle = 'rgba(200,220,255,.25)'; ctx.fillRect(0, 0, G.W, G.H); }
-        const glow = ctx.createRadialGradient(120, 64, 6, 120, 64, 60);
-        glow.addColorStop(0, 'rgba(248,208,72,.4)'); glow.addColorStop(1, 'rgba(248,208,72,0)');
-        ctx.fillStyle = glow; ctx.fillRect(0, 0, G.W, G.H);
-        mon(ctx, 'BIBIKING', 120, 64, 84, f);
-        FONT.center(ctx, 'והאלוף...', 120, 16, '#f0e0c0', { shadow: '#12203e' });
-        if (f > 40) FONT.center(ctx, 'אתה כבר יודע מי.', 120, 128, '#f8d048', { shadow: '#12203e' });
-      } },
-      { dur: 120, music: 'victory', draw(p, ctx, f) { // build your coalition / share
-        bg(ctx, '#20386a', '#101c3a');
-        ctx.fillStyle = 'rgba(244,239,226,.96)'; UI.rr(ctx, 40, 40, 160, 66, 6); ctx.fill();
-        FONT.center(ctx, 'הקואליציה שלך', 120, 46, '#204068', { noShadow: true });
-        const team = ['ATIDMON', 'BENGVIRON', 'GANTZON', 'DERIDERI'];
-        for (let i = 0; i < 4; i++) if (f > 8 + i * 8 && MONART[team[i]]) ctx.drawImage(MONART[team[i]], 54 + i * 32, 62, 30, 30);
-        FONT.center(ctx, 'בנה. שתף. תווכח.', 120, 124, '#f8d048', { shadow: '#101c3a' });
-      } },
-      { dur: 220, draw(p, ctx, f) { // end card
-        bg(ctx, '#0a0b18', '#181833');
-        sparkles(ctx, f, 30, 'rgba(255,220,150,A)');
-        const bob = Math.sin(f / 30) * 2;
-        FONT.center(ctx, 'כנסתמון', 121.5, 30 + bob, '#2a1020', { scale: 3, noShadow: true });
-        FONT.center(ctx, 'כנסתמון', 120, 28 + bob, '#f8d048', { scale: 3, shadow: '#301828' });
-        if (f > 20) FONT.center(ctx, 'שחקו עכשיו, בחינם:', 120, 74, '#c8d0f0', { shadow: '#0a0b18' });
-        if (f > 40) {
-          ctx.fillStyle = '#f6d56d'; UI.rr(ctx, 38, 88, 164, 16, 4); ctx.fill();
-          FONT.center(ctx, 'nivsheena.github.io/knessetmon', 120, 92, '#2a1c06', { noShadow: true });
-        }
-        if (f > 70) FONT.center(ctx, 'Made by Niv Sheena', 120, 118, '#a79ede', { noShadow: true });
-        if (f > 90 && ((f >> 4) & 1)) FONT.center(ctx, 'לחץ מקש כדי להתחיל', 120, 140, '#f8f8f0', { noShadow: true });
-      } },
-    ];
-    const total = SHOTS.reduce((a, s) => a + s.dur, 0);
-
+  /* ---------------- live gameplay trailer / attract mode ----------------
+     Drives the REAL engine: walks the actual cities, opens a real battle,
+     shows real dialogue, a gym, the league and the coalition card, then an
+     end card. Any key skips. G.trailer holds the letterbox+caption overlay
+     (drawn by the engine). ~50s. */
+  function EndCardScene() {
+    let f = 0;
     return {
       opaque: true,
-      onEnter() { AUD.music('title'); },
+      onEnter() { AUD.music('victory'); },
       update() {
-        if (start < 0) return;
-        if (ENG.btnp('A') || ENG.btnp('B') || ENG.btnp('START')) {
-          AUD.sfx('ok');
-          ENG.replace(TitleScene());
-        }
+        f++;
+        if (f > 40 && (ENG.btnp('A') || ENG.btnp('B') || ENG.btnp('START'))) ENG.replace(TitleScene());
       },
       draw(ctx) {
-        if (start < 0) start = G.frame;
-        let e = (G.frame - start) % total;           // loop = attract mode
-        let idx = 0, acc = 0;
-        while (idx < SHOTS.length - 1 && e >= acc + SHOTS[idx].dur) { acc += SHOTS[idx].dur; idx++; }
-        const shot = SHOTS[idx], lf = e - acc, p = lf / shot.dur;
-        if (idx !== shotIdx) { shotIdx = idx; if (shot.music) AUD.music(shot.music); }
-        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, G.W, G.H);
-        shot.draw(p, ctx, lf);
-        // cross-fade black at shot edges
-        let fade = 0;
-        if (lf < 12) fade = 1 - lf / 12;
-        else if (lf > shot.dur - 12) fade = (lf - (shot.dur - 12)) / 12;
-        if (fade > 0.01) { ctx.globalAlpha = fade; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, G.W, G.H); ctx.globalAlpha = 1; }
-        // cinematic letterbox + vignette + film grain
-        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, G.W, 12); ctx.fillRect(0, G.H - 12, G.W, 12);
-        const vg = ctx.createRadialGradient(120, 80, 60, 120, 80, 150);
-        vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.4)');
-        ctx.fillStyle = vg; ctx.fillRect(0, 0, G.W, G.H);
-        for (let i = 0; i < 24; i++) { ctx.fillStyle = `rgba(255,255,255,${0.02 + Math.random() * 0.03})`; ctx.fillRect(Math.random() * G.W | 0, 12 + Math.random() * (G.H - 24) | 0, 1, 1); }
-        // progress bar
-        ctx.fillStyle = 'rgba(248,208,72,.7)'; ctx.fillRect(0, G.H - 2, G.W * (e / total), 2);
+        const t = G.frame;
+        bgGrad(ctx, '#0a0b18', '#181833');
+        for (let i = 0; i < 30; i++) { const a = 0.3 + 0.5 * Math.abs(Math.sin(t / 30 + i * 1.7)); ctx.fillStyle = `rgba(255,220,150,${a.toFixed(2)})`; ctx.fillRect((i * 53 + 17) % 240, (i * 31 + 6) % 150, 2, 2); }
+        const bob = Math.sin(t / 30) * 2;
+        FONT.center(ctx, 'כנסתמון', 121.5, 34 + bob, '#2a1020', { scale: 3, noShadow: true });
+        FONT.center(ctx, 'כנסתמון', 120, 32 + bob, '#f8d048', { scale: 3, shadow: '#301828' });
+        FONT.center(ctx, 'שחקו עכשיו, בחינם:', 120, 78, '#c8d0f0', { shadow: '#0a0b18' });
+        ctx.fillStyle = '#f6d56d'; UI.rr(ctx, 34, 92, 172, 16, 4); ctx.fill();
+        FONT.center(ctx, 'nivsheena.github.io/knessetmon', 120, 96, '#2a1c06', { noShadow: true });
+        FONT.center(ctx, 'Made by Niv Sheena', 120, 120, '#a79ede', { noShadow: true });
+        if (f > 40 && ((f >> 4) & 1)) FONT.center(ctx, 'לחץ מקש', 120, 142, '#f8f8f0', { noShadow: true });
       },
     };
   }
+  function bgGrad(ctx, top, bot) {
+    const g = ctx.createLinearGradient(0, 0, 0, G.H);
+    g.addColorStop(0, top); g.addColorStop(1, bot);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, G.W, G.H);
+  }
+
+  function TrailerScene() {
+    let launched = false;
+
+    async function run() {
+      let aborted = false;
+      const t0 = G.frame, TOTAL = 3000;
+      const skip = () => { aborted = true; };
+      window.addEventListener('keydown', skip);
+      window.addEventListener('pointerdown', skip);
+      G.trailer = { cap: '', prog: 0 };
+      const cap = txt => { G.trailer.cap = txt; };
+      const wait = n => new Promise(r => {
+        const f0 = G.frame;
+        const iv = setInterval(() => {
+          if (G.trailer) G.trailer.prog = (G.frame - t0) / TOTAL;
+          if (aborted || G.frame - f0 >= n) { clearInterval(iv); r(); }
+        }, 12);
+      });
+      const tap = async (k, hold = 3) => { ENG.pressKey(k, true); await wait(hold); ENG.pressKey(k, false); await wait(10); };
+      async function walk(dir, steps) {
+        const key = { up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight' }[dir];
+        ENG.pressKey(key, true);
+        const sx = G.x, sy = G.y;
+        for (let g = 0; g < steps * 40 && !aborted; g++) { await wait(1); if (Math.abs(G.x - sx) + Math.abs(G.y - sy) >= steps) break; }
+        ENG.pressKey(key, false); await wait(6);
+      }
+      async function goto(mapId, x, y, dir, capText, music) {
+        await ENG.fadeOut(16);
+        OW.loadMap(mapId); G.x = x; G.y = y; G.dir = dir || 'down'; OW.locked = false;
+        if (music) AUD.music(music);
+        cap(capText);
+        await ENG.fadeIn(16); await wait(8);
+      }
+      async function line(txt, hold = 80) {
+        const p = UI.say(txt);
+        await wait(hold);
+        for (let g = 0; g < 14 && !aborted; g++) { const t = ENG.top(); if (!t || !t.pages) break; await tap('z', 3); await wait(6); }
+        await Promise.race([p, wait(20)]);
+        await wait(6);
+      }
+      async function showBattle(wildSpecies, wildLv) {
+        const done = OW.startBattle({ kind: 'wild', wild: DATA.makeMon(wildSpecies, wildLv) });
+        // reliable driver: when the action menu is up, inject the move choice
+        // straight into the battle's resolver (no menu-timing races); otherwise
+        // tap to advance intro / attack text.
+        let over = false;
+        done.then(() => { over = true; });
+        for (let g = 0; g < 700 && !aborted && !over; g++) {
+          const b = G.scenes.find(s => s.st);
+          if (b && ENG.top() === b && b.st.mode === 'action' && b.st.choice) {
+            const P = b.sides().P;
+            const mv = (P.mon.moves[1] || P.mon.moves[0]);
+            b.st.mode = null; b.st.choice({ type: 'move', move: mv });
+            await wait(6);
+          } else {
+            await tap('z', 2); await wait(4);
+          }
+        }
+        await Promise.race([done, wait(20)]);
+      }
+      function finishTitle() {
+        window.removeEventListener('keydown', skip);
+        window.removeEventListener('pointerdown', skip);
+        G.trailer = null; G.scenes.length = 0; ENG.push(TitleScene());
+      }
+
+      // ---- showcase save state ----
+      ENG.newGame('דני');
+      const party = DATA.PARTIES.find(p => p.id === 'yeshatid');
+      G.flags.starter = 'ATIDMON'; G.flags.party = 'yeshatid';
+      SPR.applyHeroStyle(party);
+      G.party = [DATA.makeMon('ATIDMON', 28), DATA.makeMon('BENGVIRON', 26), DATA.makeMon('GANTZON', 24)];
+      G.badges = ['תעודת התיק', 'תעודת הממלכתיות'];
+      G.money = 24000;
+
+      // ---- open on Tel Aviv ----
+      G.fade = 1;
+      OW.loadMap('homewood'); G.x = 9; G.y = 13; G.dir = 'up'; OW.locked = false;
+      ENG.replace(OW.scene);
+      AUD.music('title');
+      cap('תל אביב — כאן הכל מתחיל'); await ENG.fadeIn(22); await wait(20);
+      await walk('up', 3); await wait(20);
+      if (!aborted) await line('הייטקיסט: יש לי סטארט-אפ שיפתור הכל. תשקיע?');
+
+      if (aborted) return finishTitle();
+      await goto('route1', 8, 20, 'up', 'כביש 1 — פוליטיקאים פראיים בכל שיח', 'route');
+      await walk('up', 3); await wait(20);
+      cap('קרבות עם אפקט ייחודי לכל סוג'); await wait(10);
+      await showBattle('SHAWARMON', 6);
+
+      if (aborted) return finishTitle();
+      await goto('gym_jlm', 5, 6, 'up', 'מכון ירושלים — ראשי המכונים מחכים', 'boss');
+      await wait(16);
+      await line('מאי גולן: פעם לא היה לי משרד. עכשיו יש לי מכון. עם שלט!');
+
+      if (aborted) return finishTitle();
+      await goto('thistleton', 9, 10, 'up', 'ירושלים — לב המשחק', 'town');
+      await walk('up', 2); await walk('left', 2); await wait(24);
+
+      if (aborted) return finishTitle();
+      await goto('league', 5, 11, 'up', 'ליגת בלפור — כל מנהיגי העולם', 'boss');
+      await walk('up', 6); await wait(24);
+      await line('בן-גוריון: ימין, שמאל, מרכז — כולם חלק מאותו חלום.');
+
+      if (aborted) return finishTitle();
+      cap('בנה קואליציה. שתף. תווכח.');
+      await new Promise(res => {
+        ENG.push(SCN.CoalitionScene(res));
+        (async () => { await wait(170); await tap('x'); })();
+      });
+      await wait(10);
+
+      // ---- end card ----
+      await ENG.fadeOut(20);
+      window.removeEventListener('keydown', skip);
+      window.removeEventListener('pointerdown', skip);
+      G.trailer = null; G.fade = 0;
+      G.scenes.length = 0; ENG.push(EndCardScene());
+    }
+
+    return {
+      opaque: true,
+      update() { if (!launched) { launched = true; run(); } },
+      draw(ctx) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, G.W, G.H); },
+    };
+  }
+
 
   return {
     TitleScene, IntroScene, NameEntryScene, PauseMenu, CardScene,
     partySelect, partyMenu, SummaryScene, bagSelect, bagOverworld,
     DexScene, ShopScene, OptionsScene, EvolveScene, CreditsScene, GalleryScene,
-    CoalitionScene, TrailerScene, checkAchievements, ACH,
+    CoalitionScene, TrailerScene, EndCardScene, checkAchievements, ACH,
     levelUpMon, learnMoveFlow,
   };
 })();
