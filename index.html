@@ -6361,7 +6361,10 @@ const SCN = (() => {
     return {
       opaque: true,
       onEnter() { AUD.music('title'); },
-      update() { if (ENG.btnp('START') || ENG.btnp('A')) proceed(); },
+      update() {
+        if (G.pressed['t'] || G.pressed['T']) { AUD.sfx('ok'); ENG.replace(TrailerScene()); return; }
+        if (ENG.btnp('START') || ENG.btnp('A')) proceed();
+      },
       draw(ctx) {
         const t = G.frame;
         const sky = ctx.createLinearGradient(0, 0, 0, 160);
@@ -6428,9 +6431,9 @@ const SCN = (() => {
         ctx.beginPath(); ctx.ellipse(184, 131, 15 - hop2, 4, 0, 0, 7); ctx.fill();
         if (MONART.BIBIMON) ctx.drawImage(MONART.BIBIMON, 32, 84 - hop, 48, 48);
         if (MONART.BENGVIRON) ctx.drawImage(MONART.BENGVIRON, 162, 88 - hop2, 44, 44);
-        if ((t >> 5) & 1) FONT.center(ctx, 'לחץ ENTER', 120, 136, '#f8f8f0', { shadow: '#402020' });
-        FONT.center(ctx, 'תפוס את כולם — לפני הפיזור!', 120, 145, '#f8d048', { noShadow: true });
-        FONT.center(ctx, 'סאטירה. באהבה. בלי קשר למציאות (כמעט)', 120, 154, '#e8b890', { noShadow: true });
+        if ((t >> 5) & 1) FONT.center(ctx, 'לחץ ENTER', 120, 134, '#f8f8f0', { shadow: '#402020' });
+        FONT.center(ctx, 'תפוס את כולם — לפני הפיזור!', 120, 143, '#f8d048', { noShadow: true });
+        FONT.center(ctx, 'T — צפה בטריילר', 120, 152, '#e8b890', { noShadow: true });
       },
     };
   }
@@ -7238,11 +7241,189 @@ const SCN = (() => {
     };
   }
 
+  /* ---------------- cinematic trailer / attract mode ---------------- */
+  function TrailerScene() {
+    let start = -1, shotIdx = -1;
+
+    // ---- shared draw helpers ----
+    function bg(ctx, top, bot) {
+      const g = ctx.createLinearGradient(0, 0, 0, G.H);
+      g.addColorStop(0, top); g.addColorStop(1, bot);
+      ctx.fillStyle = g; ctx.fillRect(0, 0, G.W, G.H);
+    }
+    function mon(ctx, id, cx, cy, size, f, sway) {
+      const bob = Math.sin(f / 9 + cx) * (size * 0.05);
+      ctx.fillStyle = 'rgba(0,0,0,.28)';
+      ctx.beginPath(); ctx.ellipse(cx, cy + size / 2 - 1, size * 0.36, size * 0.11, 0, 0, 7); ctx.fill();
+      if (MONART[id]) {
+        ctx.save();
+        if (sway) { ctx.translate(cx, cy); ctx.rotate(Math.sin(f / 14) * 0.05); ctx.translate(-cx, -cy); }
+        ctx.drawImage(MONART[id], cx - size / 2, cy - size / 2 + bob, size, size);
+        ctx.restore();
+      }
+    }
+    function sparkles(ctx, f, n, col) {
+      for (let i = 0; i < n; i++) {
+        const a = 0.3 + 0.5 * Math.abs(Math.sin(f / 7 + i * 1.9));
+        const x = (i * 61 + (f * (0.4 + (i % 3) * 0.2))) % (G.W + 20) - 10;
+        const y = (i * 43 + 13) % G.H + Math.sin(f / 20 + i) * 4;
+        ctx.fillStyle = col.replace('A', a.toFixed(2));
+        ctx.fillRect(x, y, 2, 2);
+      }
+    }
+    // Hebrew title card: lines rise + fade, gold accent on first line
+    function card(ctx, p, big, small, col) {
+      const rise = (1 - Math.min(1, p * 3)) * 8;
+      col = col || '#f8d048';
+      FONT.center(ctx, big, 120, 58 - rise, '#2a1626', { scale: 2.4, noShadow: true });
+      FONT.center(ctx, big, 118.5, 56.5 - rise, col, { scale: 2.4, shadow: '#1a0e18' });
+      if (small) FONT.center(ctx, small, 120, 90 + rise, '#f0e8d8', { shadow: '#2a1626' });
+    }
+
+    // ---- the shot list (durations in frames @60fps) ----
+    const SHOTS = [
+      { dur: 130, music: 'title', draw(p, ctx, f) { // cold open
+        bg(ctx, '#0a0b18', '#181833');
+        sparkles(ctx, f, 26, 'rgba(200,210,255,A)');
+        FONT.center(ctx, 'בעולם שכולו בחירות...', 120, 66, '#c8d0f0', { shadow: '#0a0b18' });
+        FONT.center(ctx, 'רק אלוף אחד ישרוד.', 120, 86, '#8890c0', { noShadow: true });
+      } },
+      { dur: 130, draw(p, ctx, f) { // logo slam
+        bg(ctx, '#12203e', '#5c2c50');
+        const glow = ctx.createRadialGradient(120, 70, 4, 120, 70, 70 + Math.sin(f / 8) * 6);
+        glow.addColorStop(0, 'rgba(255,224,150,.5)'); glow.addColorStop(1, 'rgba(255,224,150,0)');
+        ctx.fillStyle = glow; ctx.fillRect(0, 0, G.W, G.H);
+        // shockwave ring on the hit
+        if (f < 26) { ctx.strokeStyle = `rgba(248,208,72,${1 - f / 26})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(120, 66, f * 5, 0, 7); ctx.stroke(); }
+        const pop = f < 10 ? 1 + (10 - f) * 0.08 : 1;
+        FONT.center(ctx, 'כנסתמון', 121.5, 50, '#2a1020', { scale: 3.6 * pop, noShadow: true });
+        FONT.center(ctx, 'כנסתמון', 120, 48, '#f8d048', { scale: 3.6 * pop, shadow: '#301828' });
+        FONT.center(ctx, 'גרסת הקואליציה', 120, 92, '#f0e0c0', { shadow: '#301828' });
+      } },
+      { dur: 150, draw(p, ctx, f) { // catch 'em all — street monster carousel
+        bg(ctx, '#2b2e50', '#171833');
+        sparkles(ctx, f, 18, 'rgba(255,220,150,A)');
+        const roster = ['FREHAMON', 'ARSMON', 'HNUNMON', 'METALMON', 'GAMERMON', 'TIKTOKMON', 'SAVTAMON'];
+        for (let i = 0; i < roster.length; i++) {
+          const x = ((f * 1.6) + i * 150) % (G.W + 180) - 90;
+          mon(ctx, roster[i], x, 74, 66, f + i * 8, true);
+        }
+        card(ctx, p, 'תפוס את כולם!', '76 מפלצות ישראליות', '#f8d048');
+      } },
+      { dur: 130, music: 'battle', draw(p, ctx, f) { // action battle
+        bg(ctx, '#7ec8f2', '#bfe6da');
+        ctx.fillStyle = '#8cc45c'; ctx.fillRect(0, 96, G.W, 64);
+        const shake = f < 60 && f > 40 ? Math.sin(f * 3) * 3 : 0;
+        ctx.save(); ctx.translate(shake, 0);
+        mon(ctx, 'BENGVIRON', 176, 58, 60, f);
+        mon(ctx, 'ATIDMON', 64, 104, 68, f);
+        ctx.restore();
+        // fire burst on the foe
+        if (f > 40 && f < 70) for (let i = 0; i < 14; i++) {
+          const a = (f - 40) / 30; ctx.globalAlpha = 1 - a;
+          ctx.fillStyle = ['#f8d030', '#f08030', '#e84020'][i % 3];
+          ctx.fillRect(176 + Math.cos(i) * a * 40, 58 + Math.sin(i * 2) * a * 30, 3, 3);
+          ctx.globalAlpha = 1;
+        }
+        card(ctx, p, 'קרבות מסעירים', 'אפקט לכל סוג', '#f85030');
+      } },
+      { dur: 140, draw(p, ctx, f) { // gym leaders
+        bg(ctx, '#241c34', '#3c2a4a');
+        const leaders = ['MANDATMON', 'GANTZON', 'IRONDOMEMON', 'BENGVIRON'];
+        const labels = ['מאי גולן', 'גנץ', 'איזנקוט', 'בן-גביר'];
+        for (let i = 0; i < 4; i++) {
+          const cx = 33 + i * 58, on = f > 12 + i * 14;
+          if (on) { mon(ctx, leaders[i], cx, 60, 50, f + i * 5); FONT.center(ctx, labels[i], cx, 92, '#f0e0c0', { noShadow: true }); }
+        }
+        FONT.center(ctx, 'נצח את ראשי המכונים', 120, 20, '#f8d048', { shadow: '#241c34' });
+      } },
+      { dur: 150, music: 'boss', draw(p, ctx, f) { // the world leaders league
+        bg(ctx, '#1a0e1e', '#3a1420');
+        for (let i = 0; i < 40; i++) { const a = 0.2 + 0.3 * Math.sin(f / 10 + i); ctx.fillStyle = `rgba(200,60,60,${a})`; ctx.fillRect((i * 31 + 7) % 240, (i * 53 + 11) % 160, 1, 1); }
+        const world = ['TRUMPMON', 'PUTINMON', 'MACRONMON', 'BIDENMON'];
+        for (let i = 0; i < 4; i++) {
+          const x = ((f * 1.2) + i * 130) % (G.W + 160) - 80;
+          mon(ctx, world[i], x, 72, 62, f + i * 9, true);
+        }
+        card(ctx, p, 'ליגת בלפור', 'המנהיגים הגדולים בעולם', '#e85040');
+      } },
+      { dur: 130, draw(p, ctx, f) { // the champion
+        bg(ctx, '#12203e', '#20283a');
+        // lightning flicker
+        if ((f >> 3) % 5 === 0) { ctx.fillStyle = 'rgba(200,220,255,.25)'; ctx.fillRect(0, 0, G.W, G.H); }
+        const glow = ctx.createRadialGradient(120, 64, 6, 120, 64, 60);
+        glow.addColorStop(0, 'rgba(248,208,72,.4)'); glow.addColorStop(1, 'rgba(248,208,72,0)');
+        ctx.fillStyle = glow; ctx.fillRect(0, 0, G.W, G.H);
+        mon(ctx, 'BIBIKING', 120, 64, 84, f);
+        FONT.center(ctx, 'והאלוף...', 120, 16, '#f0e0c0', { shadow: '#12203e' });
+        if (f > 40) FONT.center(ctx, 'אתה כבר יודע מי.', 120, 128, '#f8d048', { shadow: '#12203e' });
+      } },
+      { dur: 120, music: 'victory', draw(p, ctx, f) { // build your coalition / share
+        bg(ctx, '#20386a', '#101c3a');
+        ctx.fillStyle = 'rgba(244,239,226,.96)'; UI.rr(ctx, 40, 40, 160, 66, 6); ctx.fill();
+        FONT.center(ctx, 'הקואליציה שלך', 120, 46, '#204068', { noShadow: true });
+        const team = ['ATIDMON', 'BENGVIRON', 'GANTZON', 'DERIDERI'];
+        for (let i = 0; i < 4; i++) if (f > 8 + i * 8 && MONART[team[i]]) ctx.drawImage(MONART[team[i]], 54 + i * 32, 62, 30, 30);
+        FONT.center(ctx, 'בנה. שתף. תווכח.', 120, 124, '#f8d048', { shadow: '#101c3a' });
+      } },
+      { dur: 220, draw(p, ctx, f) { // end card
+        bg(ctx, '#0a0b18', '#181833');
+        sparkles(ctx, f, 30, 'rgba(255,220,150,A)');
+        const bob = Math.sin(f / 30) * 2;
+        FONT.center(ctx, 'כנסתמון', 121.5, 30 + bob, '#2a1020', { scale: 3, noShadow: true });
+        FONT.center(ctx, 'כנסתמון', 120, 28 + bob, '#f8d048', { scale: 3, shadow: '#301828' });
+        if (f > 20) FONT.center(ctx, 'שחקו עכשיו, בחינם:', 120, 74, '#c8d0f0', { shadow: '#0a0b18' });
+        if (f > 40) {
+          ctx.fillStyle = '#f6d56d'; UI.rr(ctx, 38, 88, 164, 16, 4); ctx.fill();
+          FONT.center(ctx, 'nivsheena.github.io/knessetmon', 120, 92, '#2a1c06', { noShadow: true });
+        }
+        if (f > 70) FONT.center(ctx, 'Made by Niv Sheena', 120, 118, '#a79ede', { noShadow: true });
+        if (f > 90 && ((f >> 4) & 1)) FONT.center(ctx, 'לחץ מקש כדי להתחיל', 120, 140, '#f8f8f0', { noShadow: true });
+      } },
+    ];
+    const total = SHOTS.reduce((a, s) => a + s.dur, 0);
+
+    return {
+      opaque: true,
+      onEnter() { AUD.music('title'); },
+      update() {
+        if (start < 0) return;
+        if (ENG.btnp('A') || ENG.btnp('B') || ENG.btnp('START')) {
+          AUD.sfx('ok');
+          ENG.replace(TitleScene());
+        }
+      },
+      draw(ctx) {
+        if (start < 0) start = G.frame;
+        let e = (G.frame - start) % total;           // loop = attract mode
+        let idx = 0, acc = 0;
+        while (idx < SHOTS.length - 1 && e >= acc + SHOTS[idx].dur) { acc += SHOTS[idx].dur; idx++; }
+        const shot = SHOTS[idx], lf = e - acc, p = lf / shot.dur;
+        if (idx !== shotIdx) { shotIdx = idx; if (shot.music) AUD.music(shot.music); }
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, G.W, G.H);
+        shot.draw(p, ctx, lf);
+        // cross-fade black at shot edges
+        let fade = 0;
+        if (lf < 12) fade = 1 - lf / 12;
+        else if (lf > shot.dur - 12) fade = (lf - (shot.dur - 12)) / 12;
+        if (fade > 0.01) { ctx.globalAlpha = fade; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, G.W, G.H); ctx.globalAlpha = 1; }
+        // cinematic letterbox + vignette + film grain
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, G.W, 12); ctx.fillRect(0, G.H - 12, G.W, 12);
+        const vg = ctx.createRadialGradient(120, 80, 60, 120, 80, 150);
+        vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.4)');
+        ctx.fillStyle = vg; ctx.fillRect(0, 0, G.W, G.H);
+        for (let i = 0; i < 24; i++) { ctx.fillStyle = `rgba(255,255,255,${0.02 + Math.random() * 0.03})`; ctx.fillRect(Math.random() * G.W | 0, 12 + Math.random() * (G.H - 24) | 0, 1, 1); }
+        // progress bar
+        ctx.fillStyle = 'rgba(248,208,72,.7)'; ctx.fillRect(0, G.H - 2, G.W * (e / total), 2);
+      },
+    };
+  }
+
   return {
     TitleScene, IntroScene, NameEntryScene, PauseMenu, CardScene,
     partySelect, partyMenu, SummaryScene, bagSelect, bagOverworld,
     DexScene, ShopScene, OptionsScene, EvolveScene, CreditsScene, GalleryScene,
-    CoalitionScene, checkAchievements, ACH,
+    CoalitionScene, TrailerScene, checkAchievements, ACH,
     levelUpMon, learnMoveFlow,
   };
 })();
@@ -7297,6 +7478,7 @@ const SCN = (() => {
   // boot
   const hash = location.hash.replace('#', '');
   if (hash === 'gallery') ENG.push(SCN.GalleryScene());
+  else if (hash === 'trailer') ENG.push(SCN.TrailerScene());
   else ENG.push(SCN.TitleScene());
   ENG.start();
 
